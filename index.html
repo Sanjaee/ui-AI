@@ -2,13 +2,21 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>EZA AI V1</title>
+    <title>EZA AI BETA</title>
     <link rel="stylesheet" href="styles.css" />
+    <style>
+      body {
+        transition: background-color 1s ease, color 1s ease;
+      }
+
+      .color-changing-text {
+        transition: color 1s ease;
+      }
+    </style>
   </head>
+
   <body>
-    <!-- Modal Popup -->
     <div id="welcomeModal" class="modal">
       <div class="modal-content">
         <span class="close" onclick="closeWelcomeModal()">&times;</span>
@@ -20,7 +28,7 @@
       </div>
     </div>
 
-    <h1 class="color-changing-text">EZA AI BETA</h1>
+    <h1 id="pageTitle" class="color-changing-text">EZA AI BETA</h1>
 
     <div class="container">
       <div class="description">
@@ -32,7 +40,6 @@
         </form>
         <div id="metaResponse"></div>
 
-        <!-- Social Icons Section -->
         <p>Support Me:</p>
         <div class="social-icons">
           <a
@@ -45,39 +52,54 @@
           /></a>
         </div>
 
-        <!-- Image Response Section -->
-
         <div id="imageResponse"></div>
       </div>
     </div>
 
     <script>
-      // Add these functions to your existing <script> tag
-
-      // Function to display the welcome modal
       function showWelcomeModal() {
         const welcomeModal = document.getElementById("welcomeModal");
         welcomeModal.style.display = "block";
       }
 
-      // Function to close the welcome modal
       function closeWelcomeModal() {
         const welcomeModal = document.getElementById("welcomeModal");
         welcomeModal.style.display = "none";
       }
 
-      // Call the showWelcomeModal function when the page is loaded
-      window.onload = showWelcomeModal;
+      function updatePageStyle(isNight) {
+        const body = document.body;
+        const pageTitle = document.getElementById("pageTitle");
+
+        if (isNight) {
+          body.style.backgroundColor = "gray";
+          body.style.color = "black";
+          pageTitle.style.color = "yellow";
+        } else {
+          body.style.backgroundColor = "white";
+          body.style.color = "black";
+          pageTitle.style.color = "blue";
+        }
+      }
+
+      function getCurrentTime() {
+        const currentTime = new Date().getHours();
+        return currentTime >= 18 || currentTime < 6; // return true if it's night
+      }
+
+      window.onload = function () {
+        showWelcomeModal();
+        updatePageStyle(getCurrentTime());
+      };
 
       async function generateMeta() {
         const title = document.getElementById("title").value;
         const metaResponseDiv = document.getElementById("metaResponse");
 
         try {
-          // Create a new paragraph for loading message
           const loadingParagraph = document.createElement("p");
           loadingParagraph.textContent = "Loading...";
-          metaResponseDiv.innerHTML = ""; // Clear previous content
+          metaResponseDiv.innerHTML = "";
           metaResponseDiv.appendChild(loadingParagraph);
 
           const response = await fetch(
@@ -87,7 +109,9 @@
               headers: {
                 "Content-Type": "application/json",
               },
-              body: JSON.stringify({ title }),
+              body: JSON.stringify({
+                title,
+              }),
             }
           );
 
@@ -96,53 +120,11 @@
             ? result.description.content
             : "No description available";
 
-          // Update the loading paragraph with the result
           loadingParagraph.textContent = `Description: ${descriptionText}`;
+          updatePageStyle(getCurrentTime()); // Update style after generating meta
         } catch (error) {
           console.error("Error generating meta data:", error);
           metaResponseDiv.innerHTML = "Error generating meta data";
-        }
-      }
-
-      async function generateImage() {
-        const prompt = document.getElementById("imagePrompt").value;
-        const imageResponseDiv = document.getElementById("imageResponse");
-
-        try {
-          // Show loading message
-          imageResponseDiv.innerHTML = "Loading...";
-
-          const response = await fetch("http://localhost:4000/openai/image", {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-            },
-            body: JSON.stringify({ prompt }),
-          });
-
-          const result = await response.json();
-
-          if (
-            result.image &&
-            Array.isArray(result.image) &&
-            result.image.length > 0
-          ) {
-            const imageResponse = result.image
-              .map(
-                (image) => `
-                            <div>
-                                <img src="${image.url}" alt="${image.revised_prompt}" style="width: 512px; height: 512px;">
-                                <p>${image.revised_prompt}</p>
-                            </div>`
-              )
-              .join("");
-            imageResponseDiv.innerHTML = imageResponse;
-          } else {
-            imageResponseDiv.innerHTML = "No image available";
-          }
-        } catch (error) {
-          console.error("Error fetching image:", error);
-          imageResponseDiv.innerHTML = "Error fetching image";
         }
       }
     </script>
