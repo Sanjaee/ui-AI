@@ -4,7 +4,7 @@
     <meta charset="UTF-8" />
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>OpenAI Response Viewer</title>
+    <title>EZA AI v1</title>
     <link rel="stylesheet" href="styles.css" />
   </head>
   <body>
@@ -12,49 +12,84 @@
 
     <div class="container">
       <div class="description">
-        <h2>Cari Materi Dari AI</h2>
+        <h2>Cari jawaban dari pertanyaanmu dengan AI</h2>
         <form id="metaForm">
           <label for="title">Title:</label>
           <textarea id="title" name="title" rows="4" required></textarea>
           <button type="button" onclick="generateMeta()">Generate AI</button>
         </form>
         <div id="metaResponse"></div>
-      </div>
 
-      <div class="tags">
+        <!-- Social Icons Section -->
+        <p>Support Me:</p>
+        <div class="social-icons">
+          <a
+            href="https://www.linkedin.com/in/ahmad-afriza-ez4-ab9173276/"
+            target="_blank"
+            ><img src="linkedin.png" alt="LinkedIn Icon"
+          /></a>
+          <a href="https://www.instagram.com/ahmdafriz4/" target="_blank"
+            ><img src="instagram.png" alt="Instagram Icon"
+          /></a>
+        </div>
+
+        <!-- Image Response Section -->
+
         <div id="imageResponse"></div>
       </div>
     </div>
 
+    <!-- Popup Section -->
+    <div class="overlay" id="overlay"></div>
+    <div class="popup" id="popup">
+      <p>
+        Jika pertanyaan terlalu banyak atau kompleks, AI ini hanya bisa merender
+        jawaban selama 10 detik. Jika lebih dari itu, maka akan terjadi error.
+      </p>
+      <button onclick="closePopup()">Tutup</button>
+    </div>
+
     <script>
+      // Function to show the popup
+      function showPopup() {
+        document.getElementById("overlay").style.display = "block";
+        document.getElementById("popup").style.display = "block";
+      }
+
+      // Function to close the popup
+      function closePopup() {
+        document.getElementById("overlay").style.display = "none";
+        document.getElementById("popup").style.display = "none";
+      }
+
+      // Your existing script...
       async function generateMeta() {
         const title = document.getElementById("title").value;
         const metaResponseDiv = document.getElementById("metaResponse");
 
         try {
-          // Show loading message
-          metaResponseDiv.innerHTML = "Loading...";
+          // Create a new paragraph for loading message
+          const loadingParagraph = document.createElement("p");
+          loadingParagraph.textContent = "Loading...";
+          metaResponseDiv.innerHTML = ""; // Clear previous content
+          metaResponseDiv.appendChild(loadingParagraph);
 
-          const response = await fetch(
-            "https://ai-4h8z.vercel.app/openai/meta",
-            {
-              method: "POST",
-              headers: {
-                "Content-Type": "application/json",
-              },
-              body: JSON.stringify({ title }),
-            }
-          );
+          // Show the popup
+          showPopup();
 
-          const result = await response.json();
-          const descriptionText = result.description
-            ? result.description.content
-            : "No description available";
+          // Simulate a delay (you can replace this with your actual API call)
+          await new Promise((resolve) => setTimeout(resolve, 3000));
 
-          metaResponseDiv.innerHTML = `<p>Description: ${descriptionText}</p>`;
+          // Continue with your fetch and processing logic...
+
+          // Hide the popup (you can remove this line if you want the popup to remain visible)
+          closePopup();
         } catch (error) {
           console.error("Error generating meta data:", error);
           metaResponseDiv.innerHTML = "Error generating meta data";
+
+          // Hide the popup in case of an error
+          closePopup();
         }
       }
 
