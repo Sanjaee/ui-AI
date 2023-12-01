@@ -32,6 +32,7 @@
 
     <div class="container">
       <div class="description">
+        <p id="greetingParagraph"></p>
         <h2>Cari jawaban dari pertanyaanmu dengan AI</h2>
         <form id="metaForm">
           <label for="title">Title:</label>
@@ -72,13 +73,15 @@
         const pageTitle = document.getElementById("pageTitle");
 
         if (isNight) {
-          body.style.backgroundColor = "gray";
+          body.style.backgroundColor = "#222831";
           body.style.color = "black";
           pageTitle.style.color = "yellow";
+          greetingParagraph.textContent = "Selamat Malam";
         } else {
-          body.style.backgroundColor = "white";
+          body.style.backgroundColor = "#f1f1f1";
           body.style.color = "black";
           pageTitle.style.color = "blue";
+          greetingParagraph.textContent = "Selamat Pagi";
         }
       }
 
@@ -120,7 +123,7 @@
             ? result.description.content
             : "No description available";
 
-          loadingParagraph.textContent = `Description: ${descriptionText}`;
+          loadingParagraph.textContent = `Hasil: ${descriptionText}`;
           updatePageStyle(getCurrentTime()); // Update style after generating meta
         } catch (error) {
           console.error("Error generating meta data:", error);
